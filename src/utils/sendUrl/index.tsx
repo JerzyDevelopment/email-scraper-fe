@@ -1,12 +1,36 @@
-import axios from 'axios'
+import axios from "axios";
+import {saveAs} from "file-saver";
 
-const sendUrl = async (url:string) => {
+const sendUrl = async (url: string) => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: `${process.env.REACT_APP_API}/generate`,
+      data: {
+        url,
+      },
+      responseType: "blob", // Set the response type to 'blob' for file download
+    });
 
-let api = "";
+    const blob = new Blob([response.data], {type: "text/csv"});
 
-    const response = await axios({method: "get", url:`${api}/${url}`})
+    const now = new Date();
+    const formattedTime = now
+      .toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+      })
+      .replace(/:/g, "-");
+    saveAs(blob, `${formattedTime}-emails.csv`);
 
-    console.log(response)
-}
+    console.log(response, "RESPONSE");
 
-export default sendUrl
+    return response;
+  } catch (error) {
+    console.error("Error downloading CSV file:", error);
+    throw error;
+  }
+};
+
+export default sendUrl;
