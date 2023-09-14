@@ -5,11 +5,14 @@ const sendUrl = async (url: string) => {
   try {
     const response = await axios({
       method: "post",
-      url: `${process.env.REACT_APP_API}/generate`,
-      data: {
+      url: `${process.env.REACT_APP_API}`,
+      data: JSON.stringify({
         url,
-      },
+      }),
       responseType: "blob", // Set the response type to 'blob' for file download
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     const blob = new Blob([response.data], {type: "text/csv"});
